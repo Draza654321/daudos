@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../models/goal.dart';
 import '../models/habit.dart';
