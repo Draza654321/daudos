@@ -16,6 +16,12 @@ class Goal {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  // 🔧 Added properties used in the UI
+  final DateTime deadline;
+  final double targetValue;
+  final double currentValue;
+  final String unit;
+
   Goal({
     required this.id,
     required this.userId,
@@ -29,11 +35,16 @@ class Goal {
     required this.milestoneCompleted,
     required this.createdAt,
     required this.updatedAt,
+    // new required fields
+    required this.deadline,
+    required this.targetValue,
+    required this.currentValue,
+    required this.unit,
   });
 
   bool get isCompleted => status == GoalStatus.completed;
-  bool get isOverdue => targetDate.isBefore(DateTime.now()) && !isCompleted;
-  int get completedMilestones => milestoneCompleted.where((completed) => completed).length;
+  bool get isOverdue => deadline.isBefore(DateTime.now()) && !isCompleted;
+  int get completedMilestones => milestoneCompleted.where((c) => c).length;
   double get milestoneProgress => milestones.isEmpty ? 0.0 : completedMilestones / milestones.length;
 
   Map<String, dynamic> toJson() {
@@ -50,6 +61,10 @@ class Goal {
       'milestoneCompleted': milestoneCompleted,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'deadline': deadline.toIso8601String(),
+      'targetValue': targetValue,
+      'currentValue': currentValue,
+      'unit': unit,
     };
   }
 
@@ -62,11 +77,15 @@ class Goal {
       category: GoalCategory.values.firstWhere((e) => e.name == json['category']),
       status: GoalStatus.values.firstWhere((e) => e.name == json['status']),
       targetDate: DateTime.parse(json['targetDate']),
-      progress: json['progress'].toDouble(),
+      progress: (json['progress'] ?? 0).toDouble(),
       milestones: List<String>.from(json['milestones']),
       milestoneCompleted: List<bool>.from(json['milestoneCompleted']),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      deadline: DateTime.parse(json['deadline']),
+      targetValue: (json['targetValue'] ?? 0).toDouble(),
+      currentValue: (json['currentValue'] ?? 0).toDouble(),
+      unit: json['unit'] ?? '',
     );
   }
 
@@ -83,6 +102,10 @@ class Goal {
     List<bool>? milestoneCompleted,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? deadline,
+    double? targetValue,
+    double? currentValue,
+    String? unit,
   }) {
     return Goal(
       id: id ?? this.id,
@@ -97,7 +120,10 @@ class Goal {
       milestoneCompleted: milestoneCompleted ?? this.milestoneCompleted,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      deadline: deadline ?? this.deadline,
+      targetValue: targetValue ?? this.targetValue,
+      currentValue: currentValue ?? this.currentValue,
+      unit: unit ?? this.unit,
     );
   }
 }
-
