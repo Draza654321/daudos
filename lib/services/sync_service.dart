@@ -179,6 +179,11 @@ class SyncService {
     return SyncStatus.idle;
   }
 
+  // Add this to satisfy build references
+  Future<void> performFullSync() async {
+    await manualSync(); // or: await syncData();
+  }
+
   // Dispose resources
   void dispose() {
     _connectivitySubscription?.cancel();
