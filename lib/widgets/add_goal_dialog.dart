@@ -113,7 +113,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                         controller: _titleController,
                         decoration: InputDecoration(
                           labelText: 'Goal Title *',
-                          hintText: 'e.g., Save $10,000 for emergency fund',
+                          hintText: 'e.g., Save \$10,000 for emergency fund',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
