@@ -251,4 +251,29 @@ class FirebaseService {
     _syncTimer?.cancel();
   }
 }
+  // Individual backup (wrapper for syncRecord)
+  Future<void> backupData(String table, String id, Map<String, dynamic> data) async {
+    await syncRecord(table, id, data, 'INSERT');
+  }
+
+  // Individual restore (reads a single document)
+  Future<Map<String, dynamic>?> restoreData(String table, String id) async {
+    final doc = await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection(table)
+        .doc(id)
+        .get();
+    return doc.exists ? doc.data() : null;
+  }
+
+  // Goal sync (assumes `goal.toJson()` is available)
+  Future<void> syncGoal(dynamic goal) async {
+    await syncRecord('goals', goal.id, goal.toJson(), 'INSERT');
+  }
+
+  // Delete goal
+  Future<void> deleteGoal(String goalId) async {
+    await syncRecord('goals', goalId, {}, 'DELETE');
+  }
 
