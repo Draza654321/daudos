@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 enum HabitType { power, struggle }
 
 enum HabitFrequency { daily, weekly, monthly }
@@ -9,10 +10,19 @@ class Habit {
   final String? description;
   final HabitType type;
   final HabitFrequency frequency;
-  final int targetCount; // e.g., 1 for daily, 7 for weekly
+  final int targetCount;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  // 🔧 Added fields used in the UI
+  final int currentStreak;
+  final int longestStreak;
+  final int totalCompletions;
+  final TimeOfDay? reminderTime;
+
+  // 🔧 To satisfy `habit.title`
+  String get title => name;
 
   Habit({
     required this.id,
@@ -25,6 +35,10 @@ class Habit {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    this.currentStreak = 0,
+    this.longestStreak = 0,
+    this.totalCompletions = 0,
+    this.reminderTime,
   });
 
   Map<String, dynamic> toJson() {
@@ -39,10 +53,25 @@ class Habit {
       'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'currentStreak': currentStreak,
+      'longestStreak': longestStreak,
+      'totalCompletions': totalCompletions,
+      'reminderTime': reminderTime != null
+          ? '${reminderTime!.hour}:${reminderTime!.minute}'
+          : null,
     };
   }
 
   factory Habit.fromJson(Map<String, dynamic> json) {
+    final reminder = json['reminderTime']?.split(':');
+    TimeOfDay? parsedReminder;
+    if (reminder != null && reminder.length == 2) {
+      parsedReminder = TimeOfDay(
+        hour: int.tryParse(reminder[0]) ?? 0,
+        minute: int.tryParse(reminder[1]) ?? 0,
+      );
+    }
+
     return Habit(
       id: json['id'],
       userId: json['userId'],
@@ -54,6 +83,10 @@ class Habit {
       isActive: json['isActive'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      currentStreak: json['currentStreak'] ?? 0,
+      longestStreak: json['longestStreak'] ?? 0,
+      totalCompletions: json['totalCompletions'] ?? 0,
+      reminderTime: parsedReminder,
     );
   }
 
@@ -68,6 +101,10 @@ class Habit {
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? currentStreak,
+    int? longestStreak,
+    int? totalCompletions,
+    TimeOfDay? reminderTime,
   }) {
     return Habit(
       id: id ?? this.id,
@@ -80,71 +117,10 @@ class Habit {
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
+      totalCompletions: totalCompletions ?? this.totalCompletions,
+      reminderTime: reminderTime ?? this.reminderTime,
     );
   }
 }
-
-class HabitEntry {
-  final String id;
-  final String habitId;
-  final String userId;
-  final DateTime date;
-  final bool completed;
-  final String? notes;
-  final DateTime createdAt;
-
-  HabitEntry({
-    required this.id,
-    required this.habitId,
-    required this.userId,
-    required this.date,
-    required this.completed,
-    this.notes,
-    required this.createdAt,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'habitId': habitId,
-      'userId': userId,
-      'date': date.toIso8601String(),
-      'completed': completed,
-      'notes': notes,
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
-
-  factory HabitEntry.fromJson(Map<String, dynamic> json) {
-    return HabitEntry(
-      id: json['id'],
-      habitId: json['habitId'],
-      userId: json['userId'],
-      date: DateTime.parse(json['date']),
-      completed: json['completed'],
-      notes: json['notes'],
-      createdAt: DateTime.parse(json['createdAt']),
-    );
-  }
-
-  HabitEntry copyWith({
-    String? id,
-    String? habitId,
-    String? userId,
-    DateTime? date,
-    bool? completed,
-    String? notes,
-    DateTime? createdAt,
-  }) {
-    return HabitEntry(
-      id: id ?? this.id,
-      habitId: habitId ?? this.habitId,
-      userId: userId ?? this.userId,
-      date: date ?? this.date,
-      completed: completed ?? this.completed,
-      notes: notes ?? this.notes,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
-}
-
